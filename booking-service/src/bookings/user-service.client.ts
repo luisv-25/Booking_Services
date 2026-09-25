@@ -11,9 +11,11 @@ export class UserServiceClient {
   // Comunicación SÍNCRONA hacia User Service: valida rol/existencia antes
   // de crear la reserva (sección 4.3 del documento de arquitectura).
   async getUser(userId: string) {
+    const url = `${this.baseUrl}/api/v1/users/${userId}`;
+    this.logger.log(`GET User Service: ${url}`);
     try {
       const { data } = await firstValueFrom(
-        this.http.get(`${this.baseUrl}/api/v1/users/${userId}`, { timeout: 3000 }),
+        this.http.get(url, { timeout: 3000 }),
       );
       return data;
     } catch (err) {
@@ -26,5 +28,7 @@ export class UserServiceClient {
     }
   }
 
-  constructor(private readonly http: HttpService) {}
+  constructor(private readonly http: HttpService) {
+    this.logger.log(`USER_SERVICE_URL = "${this.baseUrl}"`);
+  }
 }
