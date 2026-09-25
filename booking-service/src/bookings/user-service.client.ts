@@ -11,34 +11,38 @@ export class UserServiceClient {
   // Comunicación SÍNCRONA hacia User Service: valida rol/existencia antes
   // de crear la reserva (sección 4.3 del documento de arquitectura).
   async getUser(userId: string) {
-  const url = `${this.baseUrl}/api/v1/users/${userId}`;
+    const url = `${this.baseUrl}/api/v1/users/${userId}`;
 
-  try {
     this.logger.log(`Consultando User Service: ${url}`);
 
-    const { data } = await firstValueFrom(
-      this.http.get(url, {
-        timeout: 3000,
-      }),
-    );
-
-    return data;
-  } catch (err) {
-    const axiosErr = err as AxiosError;
-
-    this.logger.error(
-      `User Service respondió ${axiosErr.response?.status} para ${url}`,
-      JSON.stringify(axiosErr.response?.data),
-    );
-
-    if (axiosErr.response?.status === 404) {
-      throw new NotFoundException(
-        `Usuario ${userId} no existe en User Service`,
+    try {
+      const response = await firstValueFrom(
+        this.http.get(url, {
+          timeout: 3000,
+        }),
       );
-    }
 
-    throw err;
+      return response.data;
+    } catch (err) {
+      const axiosErr = err as AxiosError;
+
+      this.logger.error(
+        `User Service respondió ${axiosErr.response?.status} para ${url}`,
+        JSON.stringify(axiosErr.response?.data),
+      );
+
+      if (axiosErr.response?.status === 404) {
+        throw new NotFoundException(
+          `Usuario ${userId} no existe en User Service`,
+        );
+      }
+
+      this.logger.error(
+        `Fallo al consultar User Service para ${userId}: ${axiosErr.message}`,
+      );
+
+      throw err;
+    }
   }
-}
 }
 
