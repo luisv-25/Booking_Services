@@ -33,7 +33,7 @@ export class CatalogServiceClient {
   async searchTutors(filters: { subjectId?: string; level?: string }) {
     try {
       const { data } = await firstValueFrom(
-        this.http.get(`${this.baseUrl}/api/v1/tutors`, {
+        this.http.get(`${this.baseUrl}/tutors`, {
           params: filters,
           timeout: 3000,
         }),
