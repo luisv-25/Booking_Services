@@ -13,7 +13,7 @@ export class CatalogServiceClient {
   async getTutorProfile(tutorProfileId: string) {
     try {
       const { data } = await firstValueFrom(
-        this.http.get(`${this.baseUrl}/api/v1/tutors/${tutorProfileId}/profile`, {
+        this.http.get(`${this.baseUrl}/tutors/${tutorProfileId}/profile`, {
           timeout: 3000,
         }),
       );
