@@ -13,7 +13,7 @@ export class UserServiceClient {
   async getUser(userId: string) {
     try {
       const { data } = await firstValueFrom(
-        this.http.get(`${this.baseUrl}/api/v1/users/${userId}`, { timeout: 3000 }),
+        this.http.get(`${this.baseUrl}/users/${userId}`, { timeout: 3000 }),
       );
       return data;
     } catch (err) {
