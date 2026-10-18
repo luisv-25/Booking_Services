@@ -9,17 +9,18 @@ export class EventsPublisher implements OnModuleInit {
   constructor(
     @Inject("BOOKING_EVENTS_CLIENT") private readonly client: ClientProxy,
     @Inject("PAYMENT_EVENTS_CLIENT") private readonly paymentClient: ClientProxy,
+    @Inject("FEEDBACK_EVENTS_CLIENT") private readonly feedbackClient: ClientProxy,
   ) {}
 
   async onModuleInit() {
     await this.client.connect();
     await this.paymentClient.connect();
+    await this.feedbackClient.connect();
   }
 
-  // Publica en AMBAS colas (ver la nota en events.module.ts): la original
-  // que ya consume session-service y la nueva dedicada a payment-service.
-  // Mismo contenido en las dos, simplemente duplicado a dos colas físicas
-  // para lograr un fan-out real.
+  // Publica en booking_events_queue (session-service) y payment_events_queue
+  // (payment-service): mismo contenido duplicado a dos colas físicas para
+  // lograr un fan-out real (ver la nota en events.module.ts).
   private emit(eventName: string, booking: Booking) {
     this.logger.log(`Publicando ${eventName} para booking ${booking.id}`);
     const payload = {
@@ -49,5 +50,26 @@ export class EventsPublisher implements OnModuleInit {
 
   publishBookingCancelled(booking: Booking) {
     return this.emit("booking.cancelled", booking);
+  }
+
+  // Evento nuevo (sección 5.11 del documento: "session.completed |
+  // Session Service | Matching & Booking Service, Feedback Service,
+  // Content Service, Analytics Service"). Booking ya consume
+  // session.completed para marcarse completed -- este método publica el
+  // paso siguiente de esa misma cadena, ahora con studentId/tutorId que
+  // Session Service no tiene, para que Feedback no necesite una llamada
+  // síncrona (sección 4.6: "no expone llamadas salientes síncronas").
+  publishBookingCompleted(booking: Booking) {
+    this.logger.log(`Publicando booking.completed para booking ${booking.id}`);
+    return this.feedbackClient.emit("booking.completed", {
+      eventName: "booking.completed",
+      occurredAt: new Date().toISOString(),
+      data: {
+        bookingId: booking.id,
+        studentId: booking.student_id,
+        tutorId: booking.tutor_id,
+        subjectId: booking.subject_id,
+      },
+    });
   }
 }
