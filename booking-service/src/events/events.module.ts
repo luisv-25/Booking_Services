@@ -38,6 +38,20 @@ import { Booking } from "../bookings/entities/booking.entity";
           queueOptions: { durable: true },
         },
       },
+      {
+        // Cola DEDICADA para feedback-service, mismo motivo que la de
+        // payment arriba. A diferencia de booking.created/confirmed/
+        // cancelled (que sí se duplican a las tres colas), booking.completed
+        // es un evento nuevo que solo feedback-service necesita, así que
+        // solo se publica aquí (ver publishBookingCompleted más abajo).
+        name: "FEEDBACK_EVENTS_CLIENT",
+        transport: Transport.RMQ,
+        options: {
+          urls: [process.env.RABBITMQ_URL || "amqp://guest:guest@localhost:5672"],
+          queue: "feedback_events_queue",
+          queueOptions: { durable: true },
+        },
+      },
     ]),
   ],
   providers: [EventsPublisher],
@@ -45,3 +59,4 @@ import { Booking } from "../bookings/entities/booking.entity";
   exports: [EventsPublisher],
 })
 export class EventsModule {}
+
