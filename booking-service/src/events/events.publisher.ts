@@ -10,12 +10,14 @@ export class EventsPublisher implements OnModuleInit {
     @Inject("BOOKING_EVENTS_CLIENT") private readonly client: ClientProxy,
     @Inject("PAYMENT_EVENTS_CLIENT") private readonly paymentClient: ClientProxy,
     @Inject("FEEDBACK_EVENTS_CLIENT") private readonly feedbackClient: ClientProxy,
+    @Inject("ANALYTICS_EVENTS_CLIENT") private readonly analyticsClient: ClientProxy,
   ) {}
 
   async onModuleInit() {
     await this.client.connect();
     await this.paymentClient.connect();
     await this.feedbackClient.connect();
+    await this.analyticsClient.connect();
   }
 
   // Publica en booking_events_queue (session-service) y payment_events_queue
@@ -38,6 +40,7 @@ export class EventsPublisher implements OnModuleInit {
     };
     this.client.emit(eventName, payload);
     return this.paymentClient.emit(eventName, payload);
+    this.analyticsClient.emit(eventName, payload);
   }
 
   publishBookingCreated(booking: Booking) {
