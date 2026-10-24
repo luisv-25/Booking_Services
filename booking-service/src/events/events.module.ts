@@ -52,6 +52,18 @@ import { Booking } from "../bookings/entities/booking.entity";
           queueOptions: { durable: true },
         },
       },
+      {
+        // Cola DEDICADA para analytics-service, mismo motivo que las demás:
+        // una cola propia para no competir por los mensajes con los otros
+        // consumidores de booking.confirmed/cancelled.
+        name: "ANALYTICS_EVENTS_CLIENT",
+        transport: Transport.RMQ,
+        options: {
+          urls: [process.env.RABBITMQ_URL || "amqp://guest:guest@localhost:5672"],
+          queue: "booking_analytics_queue",
+          queueOptions: { durable: true },
+        },
+      },
     ]),
   ],
   providers: [EventsPublisher],
