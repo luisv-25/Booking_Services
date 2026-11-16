@@ -33,27 +33,38 @@ export class MatchingService {
 
     
     
+   
     const filtered = results.filter((t: any) => {
-      // Catalog Service devuelve los campos en snake_case.
-      const hourlyRate = Number(t.hourly_rate);
-      const avgRating = Number(t.avg_rating);
+      // Compatible con camelCase y snake_case.
+      const hourlyRate = Number(
+        t.hourlyRate ?? t.hourly_rate
+      );
     
-      if (
-        dto.maxHourlyRate !== undefined &&
-        hourlyRate > dto.maxHourlyRate
-      ) {
-        return false;
+      const avgRating = Number(
+        t.avgRating ?? t.avg_rating
+      );
+    
+      if (dto.maxHourlyRate !== undefined) {
+        if (
+          !Number.isFinite(hourlyRate) ||
+          hourlyRate > dto.maxHourlyRate
+        ) {
+          return false;
+        }
       }
     
-      if (
-        dto.minRating !== undefined &&
-        avgRating < dto.minRating
-      ) {
-        return false;
+      if (dto.minRating !== undefined) {
+        if (
+          !Number.isFinite(avgRating) ||
+          avgRating < dto.minRating
+        ) {
+          return false;
+        }
       }
     
       return true;
     });
+
 
 
 
