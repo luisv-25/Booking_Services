@@ -32,6 +32,7 @@ export class MatchingService {
     });
 
     
+    
     const filtered = results.filter((t: any) => {
       // Catalog Service devuelve los campos en snake_case.
       const hourlyRate = Number(t.hourly_rate);
@@ -53,6 +54,7 @@ export class MatchingService {
     
       return true;
     });
+
 
 
     request.resolved_at = new Date();
