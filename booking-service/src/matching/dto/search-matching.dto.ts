@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional, IsString, IsUUID, Min, Max } from "class-validator";
+import { IsNumber, IsOptional, IsString, IsUUID, IsDateString, IsInt, Min, Max } from "class-validator";
 
 export class SearchMatchingDto {
   @IsOptional()
