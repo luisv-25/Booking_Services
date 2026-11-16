@@ -4,6 +4,10 @@ import { Repository } from "typeorm";
 import { MatchingRequest } from "../bookings/entities/matching-request.entity";
 import { CatalogServiceClient } from "../bookings/catalog-service.client";
 import { SearchMatchingDto } from "./dto/search-matching.dto";
+import { BadRequestException } from "@nestjs/common";
+import { Booking, BookingStatus } from "../bookings/entities/booking.entity";
+import { BookingSlot } from "../bookings/entities/booking-slot.entity";
+
 
 @Injectable()
 export class MatchingService {
@@ -11,7 +15,13 @@ export class MatchingService {
     @InjectRepository(MatchingRequest)
     private readonly matchingRepo: Repository<MatchingRequest>,
     private readonly catalogServiceClient: CatalogServiceClient,
+    
+    @InjectRepository(BookingSlot)
+    private readonly slotsRepo: Repository<BookingSlot>,
+
   ) {}
+
+  
 
   // POST /matching/search (sección 4.3 del documento): registra la
   // búsqueda con sus filtros y delega la resolución en Catalog Service
