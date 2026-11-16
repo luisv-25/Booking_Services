@@ -6,9 +6,11 @@ import { MatchingService } from "./matching.service";
 import { MatchingController } from "./matching.controller";
 import { CatalogServiceClient } from "../bookings/catalog-service.client";
 import { JwtConfigModule } from "../common/jwt-config.module";
+import { BookingSlot } from "../bookings/entities/booking-slot.entity";
+
 
 @Module({
-  imports: [TypeOrmModule.forFeature([MatchingRequest]), HttpModule, JwtConfigModule],
+  imports: [TypeOrmModule.forFeature([MatchingRequest, BookingSlot]), HttpModule, JwtConfigModule],
   providers: [MatchingService, CatalogServiceClient],
   controllers: [MatchingController],
 })
