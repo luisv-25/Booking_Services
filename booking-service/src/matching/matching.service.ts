@@ -44,7 +44,7 @@ export class MatchingService {
     
     
    
-    const filtered = results.filter((t: any) => {
+    let filtered = results.filter((t: any) => {
       // Compatible con camelCase y snake_case.
       const hourlyRate = Number(
         t.hourlyRate ?? t.hourly_rate
@@ -75,7 +75,60 @@ export class MatchingService {
       return true;
     });
 
-
+  
+      if (dto.scheduledAt) {
+        const startTime = new Date(dto.scheduledAt);
+        const durationMinutes = dto.durationMinutes ?? 60;
+      
+        if (
+          !Number.isFinite(startTime.getTime()) ||
+          startTime.getTime() <= Date.now()
+        ) {
+          throw new BadRequestException(
+            "El horario solicitado debe ser una fecha futura válida",
+          );
+        }
+      
+        const endTime = new Date(
+          startTime.getTime() + durationMinutes * 60_000,
+        );
+      
+        // Busca tutores con reservas activas que se solapen
+        // con el horario solicitado.
+        const occupied = await this.slotsRepo
+          .createQueryBuilder("slot")
+          .innerJoin(
+            Booking,
+            "booking",
+            "booking.id = slot.booking_id",
+          )
+          .select("booking.tutor_id", "tutorId")
+          .where("booking.status IN (:...statuses)", {
+            statuses: [
+              BookingStatus.PENDING,
+              BookingStatus.CONFIRMED,
+            ],
+          })
+          .andWhere("slot.locked_until > :now", {
+            now: new Date(),
+          })
+          .andWhere("slot.start_time < :endTime", {
+            endTime,
+          })
+          .andWhere("slot.end_time > :startTime", {
+            startTime,
+          })
+          .getRawMany<{ tutorId: string }>();
+      
+        const occupiedIds = new Set(
+          occupied.map((row) => row.tutorId),
+        );
+      
+        filtered = filtered.filter(
+          (t: any) => !occupiedIds.has(t.id),
+        );
+      }
+    
 
 
     request.resolved_at = new Date();
