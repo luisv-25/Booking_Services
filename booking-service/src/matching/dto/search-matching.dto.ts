@@ -13,5 +13,5 @@ export class SearchMatchingDto {
   @IsNumber()
   @Min(0)
   @Max(5)
-  maxHourlyRate?: number;
+  minRating?: number;
 }
