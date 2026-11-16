@@ -12,6 +12,11 @@ export class SearchMatchingDto {
   @IsOptional()
   @IsNumber()
   @Min(0)
+  maxHourlyRate?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
   @Max(5)
   minRating?: number;
 }
