@@ -31,9 +31,29 @@ export class MatchingService {
       level: dto.level,
     });
 
-    const filtered = dto.maxHourlyRate
-      ? results.filter((t: any) => Number(t.hourlyRate) <= dto.maxHourlyRate!)
-      : results;
+    
+    const filtered = results.filter((t: any) => {
+      // Catalog Service devuelve los campos en snake_case.
+      const hourlyRate = Number(t.hourly_rate);
+      const avgRating = Number(t.avg_rating);
+    
+      if (
+        dto.maxHourlyRate !== undefined &&
+        hourlyRate > dto.maxHourlyRate
+      ) {
+        return false;
+      }
+    
+      if (
+        dto.minRating !== undefined &&
+        avgRating < dto.minRating
+      ) {
+        return false;
+      }
+    
+      return true;
+    });
+
 
     request.resolved_at = new Date();
     await this.matchingRepo.save(request);
