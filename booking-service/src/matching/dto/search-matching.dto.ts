@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional, IsString, IsUUID, Min } from "class-validator";
+import { IsNumber, IsOptional, IsString, IsUUID, Min, Max } from "class-validator";
 
 export class SearchMatchingDto {
   @IsOptional()
@@ -12,5 +12,6 @@ export class SearchMatchingDto {
   @IsOptional()
   @IsNumber()
   @Min(0)
+  @Max(5)
   maxHourlyRate?: number;
 }
