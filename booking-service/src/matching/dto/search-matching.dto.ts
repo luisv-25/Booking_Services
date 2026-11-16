@@ -19,4 +19,16 @@ export class SearchMatchingDto {
   @Min(0)
   @Max(5)
   minRating?: number;
+
+  
+  @IsOptional()
+  @IsDateString()
+  scheduledAt?: string;
+  
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(480)
+  durationMinutes?: number;
+
 }
