@@ -60,7 +60,7 @@ import { Booking } from "../bookings/entities/booking.entity";
         transport: Transport.RMQ,
         options: {
           urls: [process.env.RABBITMQ_URL || "amqp://guest:guest@localhost:5672"],
-          queue: "booking_analytics_queue",
+          queue: "analytics_events_queue",
           queueOptions: { durable: true },
         },
       },
